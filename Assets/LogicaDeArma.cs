@@ -7,6 +7,7 @@ public class LogicaDeArma : MonoBehaviour
     [Header("Generales")]
     public AudioSource audiosource;
     public Animator animator;
+    public Transform PtoDisparo;
     
 
     [Header("Sonidos")]
@@ -15,6 +16,12 @@ public class LogicaDeArma : MonoBehaviour
     public AudioClip SonSinBalas;
     public AudioClip SonCartuchoSale;
     public AudioClip SonCartuchoEntra;
+    public ParticleSystem fuegodeArma;
+
+    [Header("Enemigo")]
+    public GameObject GOEnemigo;
+    public float dano = 20f;
+    public vida vidaEnemigo;
 
 
     [Header("Valores Iniciales")]
@@ -44,6 +51,11 @@ public class LogicaDeArma : MonoBehaviour
         BalasRestantes = MaxBalas;
 
         Invoke("HabilitarArma",0.3f);
+        fuegodeArma.Stop();
+
+        GOEnemigo = GameObject.Find("Zombie");
+        //GOEnemigo = GameObject.FindWithTag("Enemigo");
+        vidaEnemigo= GOEnemigo.GetComponent<vida>();
         
     }
 
@@ -90,6 +102,14 @@ public class LogicaDeArma : MonoBehaviour
             ReproducirAnimacionDisparo();
             BalasEnCartucho--;
             StartCoroutine(RevisarTiempoNoDisparo());
+            RaycastHit Hit;
+            if(Physics.Raycast(PtoDisparo.position,PtoDisparo.forward,out Hit))
+            {
+                if(Hit.transform.CompareTag("Enemigo"))
+                {
+                    vidaEnemigo.RecibirDaño(dano);
+                }
+            }
         
     }
 
@@ -132,6 +152,8 @@ public virtual void ReproducirAnimacionDisparo()
 {
         audiosource.PlayOneShot(SonDisparo);
         animator.CrossFadeInFixedTime("Fire", 0.1f);
+        fuegodeArma.Stop();
+        fuegodeArma.Play();
         
 }
 
