@@ -22,6 +22,7 @@ public class LogicaDeArma : MonoBehaviour
     public GameObject GOEnemigo;
     public float dano = 20f;
     public vida vidaEnemigo;
+    public GameObject efectoDanoPrefab;
 
 
     [Header("Valores Iniciales")]
@@ -53,9 +54,9 @@ public class LogicaDeArma : MonoBehaviour
         Invoke("HabilitarArma",0.3f);
         fuegodeArma.Stop();
 
-        GOEnemigo = GameObject.Find("Zombie");
+        //GOEnemigo = GameObject.Find("Zombie");
         //GOEnemigo = GameObject.FindWithTag("Enemigo");
-        vidaEnemigo= GOEnemigo.GetComponent<vida>();
+        //vidaEnemigo= GOEnemigo.GetComponent<vida>();
         
     }
 
@@ -103,14 +104,25 @@ public class LogicaDeArma : MonoBehaviour
             BalasEnCartucho--;
             StartCoroutine(RevisarTiempoNoDisparo());
             RaycastHit Hit;
+            
             if(Physics.Raycast(PtoDisparo.position,PtoDisparo.forward,out Hit))
             {
                 if(Hit.transform.CompareTag("Enemigo"))
                 {
+                    GOEnemigo = Hit.collider.gameObject;
+                    vidaEnemigo= GOEnemigo.GetComponent<vida>();
+
                     vidaEnemigo.RecibirDaño(dano);
+                    CrearEfectoDano(Hit.point,Hit.transform.rotation);
+                    
                 }
             }
         
+    }
+
+    public void CrearEfectoDano(Vector3 pos,Quaternion rot)
+    {
+        GameObject efectodano = Instantiate(efectoDanoPrefab,pos,rot);
     }
 
     IEnumerator RevisarTiempoNoDisparo()
